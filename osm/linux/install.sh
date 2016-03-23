@@ -10,7 +10,7 @@ case ${KERNEL_VER} in
 	OBJ=o
 	MODVER=`modinfo -f%{kernel_version} ${PWD}/${TARGETNAME}.${OBJ}`
 	;;
-	2.6 | 3.* )
+	2.6 | 3.* | 4.* )
 	OBJ=ko
 	MODVER=`modinfo -F vermagic ${PWD}/${TARGETNAME}.${OBJ} | cut -d' ' -f1`
 	;;
@@ -73,9 +73,10 @@ fi
 MKINITRD=`which mkinitrd 2> /dev/null`
 [ "$MKINITRD" = "" ] && MKINITRD=`which mkinitramfs 2> /dev/null`
 [ "$MKINITRD" = "" ] && MKINITRD=`which dracut 2> /dev/null`
+[ "$MKINITRD" = "" ] && MKINITRD=`which mkinitcpio 2> /dev/null`
 
 if test "$MKINITRD" = "" ; then
-	echo "Can not find command 'mkinitrd' or 'mkinitramfs' or 'dracut'."
+	echo "Can not find command 'mkinitrd' or 'mkinitramfs' or 'dracut' or 'mkinitcpio'."
 	exit 1
 fi
 
@@ -91,6 +92,7 @@ distinfo() {
 	[ -e /etc/SuSE-release ] && { echo suse; return; }
 	[ -e /etc/debian_version ] && { echo debian; return; }
 	[ -e /etc/turbolinux-release ] && { echo turbo; return; }
+        [ -e /etc/manjaro-release ] && { echo manjaro; return; }
 	if [ -e $issue ]; then
 		grep -i "debian" $issue && { echo debian; return; }
 		grep -i "ubuntu" $issue && { echo ubuntu; return; }
@@ -157,6 +159,12 @@ debian | ubuntu )
 #		fi
 #	fi
 	$MKINITRD -o /boot/initrd.img-${MODVER} ${MODVER}
+;;
+manjaro )
+        # maybe a manjaro guy can help here
+        # first we should backup the old one
+        # then we run mkinitcpio -p linux<major><minor>
+        echo "Actually you have to update the initrd manually. We suggest to make backup of actual initrd. To create new one run mkinitcpio -p linux44."
 ;;
 * )
 	echo "Unknown distribution - You have to update the initrd image manually."
