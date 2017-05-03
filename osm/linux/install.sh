@@ -3,6 +3,8 @@
 if test "${KERNEL_VER-set}" = set; then echo "KERNEL_VER is not set"; exit 1; fi
 if test "${TARGETNAME-set}" = set; then echo "TARGETNAME is not set"; exit 1; fi
 
+echo "Detected kernel version: ${KERNEL_VER}"
+
 PWD=`pwd`
 
 case ${KERNEL_VER} in
